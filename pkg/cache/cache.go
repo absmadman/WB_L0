@@ -6,11 +6,11 @@ import (
 )
 
 type Cache struct {
-	Cache *lru.Cache[int, string]
+	Cache *lru.Cache[int, []byte]
 }
 
 func NewCache(cfg *config.Config) *Cache {
-	tmp, _ := lru.New[int, string](cfg.CacheSize)
+	tmp, _ := lru.New[int, []byte](cfg.CacheSize)
 	return &Cache{
 		Cache: tmp,
 	}
