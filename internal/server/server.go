@@ -1,6 +1,7 @@
 package server
 
 import (
+	"WB_L0/pkg/cache"
 	"WB_L0/pkg/config"
 	"WB_L0/pkg/db"
 	"github.com/gin-gonic/gin"
@@ -12,6 +13,7 @@ import (
 type Handler struct {
 	router   *gin.Engine
 	database *db.Database
+	cache    *cache.Cache
 }
 
 const a = `"{
@@ -64,10 +66,11 @@ const a = `"{
   "oof_shard": "1"
 }"`
 
-func NewHandler(db *db.Database, engine *gin.Engine, cfg *config.Config) *Handler {
+func NewHandler(db *db.Database, engine *gin.Engine, cache *cache.Cache, cfg *config.Config) *Handler {
 	return &Handler{
 		router:   engine,
 		database: db,
+		cache:    cache,
 	}
 }
 
@@ -91,6 +94,17 @@ func (h *Handler) getDataById(ctx *gin.Context) {
 
 func (h *Handler) putData(ctx *gin.Context) {
 	h.database.InsertDatabase(a)
+}
+
+func (h *Handler) InitCache(cfg *config.Config) {
+	for i := 1; i < cfg.CacheSize; i++ {
+		item, err := h.database.SelectById(i)
+		if err != nil {
+			return
+		}
+		id, _ := strconv.Atoi(item.Id)
+		h.cache.Cache.Add(id, item.Message)
+	}
 }
 
 func (h *Handler) Serve() {
