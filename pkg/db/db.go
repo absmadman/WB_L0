@@ -45,11 +45,12 @@ func (db *Database) InsertDatabase(message string) error {
 	return err
 }
 
-func (db *Database) SelectById(id int) entities.Item {
+func (db *Database) SelectById(id int) (*entities.Item, error) {
 	var item entities.Item
 	err := db.connection.QueryRow(selectById, id).Scan(&item.Id, &item.Message)
 	if err != nil {
 		log.Println(err)
+		return nil, err
 	}
-	return item
+	return &item, nil
 }

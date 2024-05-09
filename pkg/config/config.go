@@ -10,6 +10,7 @@ type Config struct {
 	DatabasePassword string
 	Client           string
 	Server           string
+	CacheSize        int
 }
 
 func NewConfig() *Config {
@@ -24,5 +25,6 @@ func NewConfig() *Config {
 		DatabasePassword: "postgres",
 		Server:           os.Getenv("NATS_SERVER"),
 		Client:           os.Getenv("NATS_CLIENT"),
+		CacheSize:        256,
 	}
 }
