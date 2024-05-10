@@ -41,7 +41,3 @@ func (s *Streaming) Sub() {
 		s.cache.Cache.Add(id, m.Data)
 	}, stan.DurableName("my-durable"))
 }
-
-func (s *Streaming) Pub() {
-	s.connection.Publish("foo", []byte("Hello world"))
-}

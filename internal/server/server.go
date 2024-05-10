@@ -5,11 +5,15 @@ import (
 	"WB_L0/pkg/cache"
 	"WB_L0/pkg/config"
 	"WB_L0/pkg/db"
+	"context"
 	"github.com/gin-gonic/gin"
 	"html/template"
 	"log"
 	"net/http"
+	"os/signal"
 	"strconv"
+	"syscall"
+	"time"
 )
 
 type Handler struct {
@@ -28,10 +32,6 @@ func NewHandler(db *db.Database, engine *gin.Engine, cache *cache.Cache, cfg *co
 
 func (h *Handler) hello(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, `message: Hello World!`)
-}
-
-func DrawPage() {
-
 }
 
 func (h *Handler) getDataById(ctx *gin.Context) {
@@ -73,10 +73,30 @@ func (h *Handler) InitCache(cfg *config.Config) {
 }
 
 func (h *Handler) Serve() {
+	// для graceful shutdown
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
+
 	h.router.GET("/hello", h.hello)
 	h.router.GET("/", h.getDataById)
-	err := h.router.Run("localhost:8080")
-	if err != nil {
-		log.Println("Server: error running server")
+
+	srv := &http.Server{
+		Addr:    ":8080",
+		Handler: h.router,
 	}
+	//graceful shutdown part
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen: %s\n", err)
+		}
+	}()
+	<-ctx.Done()
+	stop()
+	log.Println("shutting down gracefully, press Ctrl+C again to force")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatal("Server forced to shutdown: ", err)
+	}
+	log.Println("Server exiting")
 }
