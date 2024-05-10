@@ -6,6 +6,7 @@ import (
 	"WB_L0/pkg/config"
 	"WB_L0/pkg/db"
 	"github.com/gin-gonic/gin"
+	"html/template"
 	"log"
 	"net/http"
 	"strconv"
@@ -29,6 +30,10 @@ func (h *Handler) hello(ctx *gin.Context) {
 	ctx.IndentedJSON(http.StatusOK, `message: Hello World!`)
 }
 
+func DrawPage() {
+
+}
+
 func (h *Handler) getDataById(ctx *gin.Context) {
 	var item entities.Item
 	queryId := ctx.Query("id")
@@ -44,12 +49,16 @@ func (h *Handler) getDataById(ctx *gin.Context) {
 	} else {
 		item, err = h.database.SelectById(id)
 		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "id is not exist"})
+			tmpl, _ := template.New("page").Parse(outOfRangePage)
+			tmpl.Execute(ctx.Writer, nil)
 			return
 		}
 	}
 	h.cache.Cache.Add(id, item.Message)
-	ctx.IndentedJSON(http.StatusOK, gin.H{"id": item.Id, "message": item.Message})
+	total := h.database.GetTotal()
+	pageData := entities.NewPage(string(item.Message), id, total, id+1, id-1, total)
+	tmpl, _ := template.New("page").Parse(page)
+	tmpl.Execute(ctx.Writer, pageData)
 }
 
 func (h *Handler) InitCache(cfg *config.Config) {

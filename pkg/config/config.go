@@ -15,7 +15,7 @@ func NewConfig() *Config {
 		DatabaseLogin:    "postgres",
 		DatabasePassword: "postgres",
 		ClusterId:        "test-cluster",
-		ClientId:         "server",
+		ClientId:         "receiver",
 		CacheSize:        256,
 	}
 }

@@ -43,6 +43,12 @@ func (db *Database) InsertDatabase(message []byte) (int, error) {
 	return int(id), err
 }
 
+func (db *Database) GetTotal() int {
+	count := 0
+	db.connection.QueryRow(getTotal).Scan(&count)
+	return count
+}
+
 func (db *Database) SelectById(id int) (entities.Item, error) {
 	var item entities.Item
 	err := db.connection.QueryRow(selectById, id).Scan(&item.Id, &item.Message)
