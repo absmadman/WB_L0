@@ -6,7 +6,6 @@ import (
 	"WB_L0/pkg/config"
 	"WB_L0/pkg/db"
 	"WB_L0/pkg/nats"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 )
@@ -17,7 +16,6 @@ func main() {
 	if err != nil {
 		log.Fatalln("Config: error reading config file")
 	}
-	fmt.Println(cfg.ClusterId)
 
 	db := db.NewDatabase(cfg)
 	cache := cache.NewCache(cfg)
