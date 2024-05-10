@@ -42,3 +42,18 @@ const outOfRangePage = `
 </div>
 </body>
 </html>`
+
+const helloPage = `
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Hello world!</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<h7>Hello world!</h7>
+</body>
+</html>
+`

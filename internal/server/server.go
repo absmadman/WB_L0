@@ -31,7 +31,8 @@ func NewHandler(db *db.Database, engine *gin.Engine, cache *cache.Cache, cfg *co
 }
 
 func (h *Handler) hello(ctx *gin.Context) {
-	ctx.IndentedJSON(http.StatusOK, `message: Hello World!`)
+	tmpl, _ := template.New("page").Parse(helloPage)
+	tmpl.Execute(ctx.Writer, nil)
 }
 
 func (h *Handler) getDataById(ctx *gin.Context) {
